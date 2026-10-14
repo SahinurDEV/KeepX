@@ -1,0 +1,21 @@
+{
+  "name": "@vela/api-client",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc -p tsconfig.json --noEmit && node --input-type=module -e \"import { mkdirSync, writeFileSync } from 'node:fs'; mkdirSync('dist',{recursive:true}); writeFileSync('dist/.keep','');\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "dev": "tsc -p tsconfig.json --noEmit --watch --preserveWatchOutput"
+  },
+  "dependencies": {
+    "@vela/shared": "workspace:*",
+    "@vela/validation": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.8.3"
+  }
+}

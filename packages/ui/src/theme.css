@@ -1,0 +1,54 @@
+:root {
+  --bg: 210 40% 98%;
+  --surface: 0 0% 100%;
+  --sidebar: 214 40% 96%;
+  --ink: 222 28% 14%;
+  --muted: 215 14% 42%;
+  --line: 214 24% 90%;
+  --accent: 224 86% 58%;
+  --accent-ink: 0 0% 100%;
+  --danger: 4 72% 48%;
+  --high: 4 74% 48%;
+  --medium: 28 78% 42%;
+  --low: 152 42% 34%;
+  --shadow: 222 40% 20%;
+  color-scheme: light;
+}
+
+.dark {
+  --bg: 222 28% 8%;
+  --surface: 222 24% 12%;
+  --sidebar: 222 24% 10%;
+  --ink: 210 40% 96%;
+  --muted: 215 14% 70%;
+  --line: 220 14% 22%;
+  --accent: 224 90% 70%;
+  --accent-ink: 222 40% 10%;
+  --danger: 4 78% 68%;
+  --high: 4 78% 68%;
+  --medium: 32 80% 64%;
+  --low: 152 40% 62%;
+  --shadow: 0 0% 0%;
+  color-scheme: dark;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  min-height: 100%;
+  background: hsl(var(--bg));
+  color: hsl(var(--ink));
+}
+
+body {
+  font-family: var(--font-sans), "Segoe UI", sans-serif;
+}
+
+:focus-visible {
+  outline: 2px solid hsl(var(--accent));
+  outline-offset: 2px;
+}
