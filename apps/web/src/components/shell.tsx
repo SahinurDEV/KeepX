@@ -146,7 +146,7 @@ export function Shell({ children }: { children: ReactNode }) {
                 id="task-search"
                 name="q"
                 placeholder="Search tasks"
-                className="h-10 w-full rounded-xl border border-line bg-surface pl-9 pr-3 text-sm shadow-sm"
+                className="h-10 w-full rounded-full border border-line bg-surface pl-9 pr-3 text-sm shadow-sm"
               />
             </div>
           </form>
@@ -243,7 +243,7 @@ function NavLink({
 
 function ListDot({ list }: { list: ListDto }) {
   const colors: Record<ListDto["color"], string> = {
-    clay: "bg-[#b64a2a]",
+    clay: "bg-accent",
     sea: "bg-[#2f6f6a]",
     plum: "bg-[#6d4c7d]",
     moss: "bg-[#4d7c0f]",

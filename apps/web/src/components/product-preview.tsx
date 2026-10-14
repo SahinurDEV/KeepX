@@ -1,3 +1,5 @@
+import { appName } from "@/lib/api";
+
 const lists = ["Today", "Inbox", "Upcoming", "Calendar"];
 
 const tasks = [
@@ -12,7 +14,7 @@ export function ProductPreview() {
     <div className="mx-auto w-full max-w-6xl overflow-hidden rounded-t-3xl border border-b-0 border-line bg-surface shadow-[0_30px_80px_-40px_hsl(var(--accent)/0.45)]">
       <div className="grid min-h-[420px] md:grid-cols-[200px_1fr_280px]">
         <aside className="hidden border-r border-line bg-sidebar/70 p-4 md:block">
-          <p className="px-2 pb-4 text-sm font-semibold text-accent">Vela</p>
+          <p className="px-2 pb-4 text-sm font-semibold text-accent">{appName()}</p>
           <ul className="space-y-1 text-sm">
             {lists.map((item) => (
               <li key={item} className={`rounded-lg px-2 py-2 ${item === "Inbox" ? "bg-accent/10 font-medium text-accent" : "text-muted"}`}>

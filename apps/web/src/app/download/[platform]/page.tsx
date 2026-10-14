@@ -33,7 +33,7 @@ export default async function PlatformPage({ params }: { params: Promise<{ platf
         {item.releaseNotes ? <p className="mt-2">{item.releaseNotes}</p> : null}
         {item.checksum ? <p className="mt-4 font-mono text-sm">Checksum {item.checksum}</p> : <p className="mt-4 text-sm text-muted">No checksum is published.</p>}
         {item.status === "available" && item.href ? (
-          <Link className="mt-6 inline-flex rounded-lg bg-accent px-4 py-2 font-medium text-accent-ink" href={item.href}>
+          <Link className="mt-6 inline-flex rounded-full bg-accent px-4 py-2 font-medium text-accent-ink" href={item.href}>
             Continue
           </Link>
         ) : (

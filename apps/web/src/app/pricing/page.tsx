@@ -25,7 +25,7 @@ export default function PricingPage() {
                 ))}
               </ul>
               {plan.available ? (
-                <Link className="mt-6 inline-flex rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-ink" href="/signup">
+                <Link className="mt-6 inline-flex rounded-full bg-accent px-4 py-2 text-sm font-medium text-accent-ink" href="/signup">
                   Create a free account
                 </Link>
               ) : (

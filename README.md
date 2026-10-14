@@ -1,4 +1,4 @@
-# Vela
+# KeepX
 
 Personal task manager. Internal codename: Project Orbit.
 
@@ -58,7 +58,7 @@ Open http://localhost:3000. The web app proxies `/api/v1` to the API, so the ses
 
 ## License
 
-Vela is open source under the [MIT License](LICENSE).
+KeepX is open source under the [MIT License](LICENSE).
 
 ## Docs
 

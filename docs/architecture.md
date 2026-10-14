@@ -1,6 +1,6 @@
 # Architecture
 
-Internal codename: Project Orbit. Default product name: Vela.
+Internal codename: Project Orbit. Default product name: KeepX.
 
 ## What exists
 

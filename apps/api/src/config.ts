@@ -26,7 +26,7 @@ export function getConfig(): Config {
     appOrigin: process.env.APP_ORIGIN ?? "http://localhost:3000",
     cookieSecure: process.env.COOKIE_SECURE === "true",
     bcryptCost,
-    appName: process.env.APP_NAME?.trim() || "Vela",
+    appName: process.env.APP_NAME?.trim() || "KeepX",
     trustProxy: process.env.TRUST_PROXY === "true",
     nodeEnv: process.env.NODE_ENV ?? "development",
   };

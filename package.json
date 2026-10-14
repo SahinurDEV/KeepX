@@ -3,7 +3,7 @@
   "private": true,
   "license": "MIT",
   "version": "0.1.0",
-  "description": "Vela, a personal task manager. Internal codename Project Orbit.",
+  "description": "KeepX, a personal task manager. Internal codename Project Orbit.",
   "packageManager": "pnpm@9.15.9",
   "engines": {
     "node": ">=20"

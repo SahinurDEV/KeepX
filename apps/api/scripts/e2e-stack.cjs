@@ -68,7 +68,7 @@ async function main() {
     COOKIE_SECURE: "false",
     BCRYPT_COST: "4",
     TRUST_PROXY: "false",
-    APP_NAME: "Vela",
+    APP_NAME: "KeepX",
     NODE_ENV: "development",
   });
   await waitForOk(`http://127.0.0.1:${apiPort}/api/v1/health`);
@@ -76,7 +76,7 @@ async function main() {
     ...process.env,
     PORT: webPort,
     API_PROXY_URL: `http://127.0.0.1:${apiPort}`,
-    NEXT_PUBLIC_APP_NAME: "Vela",
+    NEXT_PUBLIC_APP_NAME: "KeepX",
     NEXT_DIST_DIR: ".next-e2e",
     NODE_ENV: "development",
   });

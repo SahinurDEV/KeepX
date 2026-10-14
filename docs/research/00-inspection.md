@@ -34,7 +34,7 @@ Proprietary source, branding, icons, and visual assets were not copied. Public m
 
 - Build a pnpm + Turborepo monorepo.
 - Ship a real web app and API first. Do not add desktop, mobile, or extension packages until they can be built and verified.
-- Brand defaults to **Vela**. The internal codename remains **Project Orbit**. The public name is the `APP_NAME` / `NEXT_PUBLIC_APP_NAME` setting.
+- Brand defaults to **KeepX**. The internal codename remains **Project Orbit**. The public name is the `APP_NAME` / `NEXT_PUBLIC_APP_NAME` setting.
 - Persist data in MongoDB through Mongoose. Tests use `mongodb-memory-server` so they do not need Atlas credentials.
 - Authenticate with httpOnly session cookies and bcrypt password hashes.
 - Proxy `/api/v1` through the Next.js app so the session cookie stays on the web origin.

@@ -3,7 +3,7 @@ import { createApiClient } from "@vela/api-client";
 export const api = createApiClient("");
 
 export function appName(): string {
-  return process.env.NEXT_PUBLIC_APP_NAME?.trim() || "Vela";
+  return process.env.NEXT_PUBLIC_APP_NAME?.trim() || "KeepX";
 }
 
 export function safeNext(value: string | null | undefined): string {

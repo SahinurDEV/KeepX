@@ -1,5 +1,5 @@
 export const APP_VERSION = "0.1.0";
-export const DEFAULT_APP_NAME = "Vela";
+export const DEFAULT_APP_NAME = "KeepX";
 export const INTERNAL_CODENAME = "Orbit";
 
 export const LIST_COLORS = ["clay", "sea", "plum", "moss", "gold", "slate", "rose", "sky"] as const;

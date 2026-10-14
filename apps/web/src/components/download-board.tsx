@@ -26,7 +26,7 @@ export function DownloadBoard() {
           <p className="text-sm text-muted">Suggested for this device</p>
           <p className="mt-1 text-lg font-medium">{suggestion.label}</p>
           {suggestion.status === "available" && suggestion.href ? (
-            <Link className="mt-3 inline-flex rounded-lg bg-accent px-3 py-2 text-sm font-medium text-accent-ink" href={suggestion.href}>
+            <Link className="mt-3 inline-flex rounded-full bg-accent px-3 py-2 text-sm font-medium text-accent-ink" href={suggestion.href}>
               Open {suggestion.label}
             </Link>
           ) : (
