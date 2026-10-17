@@ -1,25 +1,40 @@
 import type { ListDto, OccurrenceDto, ReminderDto, TagDto, TaskDto, UserDto } from "@vela/shared";
 import type { TaskRecord } from "./models.js";
 
-export function toUserDto(user: { _id: { toString(): string }; email: string; name: string; timeZone: string; createdAt: Date }): UserDto {
+export function toUserDto(user: {
+  _id: { toString(): string };
+  email: string;
+  name: string;
+  timeZone: string;
+  emailReminders?: boolean;
+  pushReminders?: boolean;
+  plan?: string;
+  createdAt: Date;
+}): UserDto {
   return {
     id: user._id.toString(),
     email: user.email,
     name: user.name,
     timeZone: user.timeZone,
+    emailReminders: Boolean(user.emailReminders),
+    pushReminders: Boolean(user.pushReminders),
+    plan: user.plan === "plus" ? "plus" : "personal",
     createdAt: user.createdAt.toISOString(),
   };
 }
 
-export function toListDto(list: {
-  _id: { toString(): string };
-  name: string;
-  color: string;
-  icon: string;
-  sortOrder: number;
-  isInbox: boolean;
-  archivedAt?: Date | null;
-}): ListDto {
+export function toListDto(
+  list: {
+    _id: { toString(): string };
+    name: string;
+    color: string;
+    icon: string;
+    sortOrder: number;
+    isInbox: boolean;
+    archivedAt?: Date | null;
+  },
+  role: ListDto["role"],
+): ListDto {
   return {
     id: list._id.toString(),
     name: list.name,
@@ -28,6 +43,7 @@ export function toListDto(list: {
     sortOrder: list.sortOrder,
     isInbox: list.isInbox,
     archivedAt: list.archivedAt ? list.archivedAt.toISOString() : null,
+    role,
   };
 }
 
@@ -63,8 +79,12 @@ export function toTaskDto(task: TaskRecord): TaskDto {
     reminderOffsetMinutes: task.reminderOffsetMinutes ?? null,
     recurrence,
     anchorAt: task.anchorAt ? task.anchorAt.toISOString() : null,
+    occurrenceOriginalDueAt: task.series?.dueAt ? task.series.dueAt.toISOString() : null,
     parentId: task.parentId ? task.parentId.toString() : null,
     sortOrder: task.sortOrder,
+    pinned: Boolean(task.pinned),
+    assigneeId: task.assigneeId ? task.assigneeId.toString() : null,
+    assigneeName: null,
     completedAt: task.completedAt ? task.completedAt.toISOString() : null,
     deletedAt: task.deletedAt ? task.deletedAt.toISOString() : null,
     createdAt: task.createdAt.toISOString(),

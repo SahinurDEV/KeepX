@@ -1,6 +1,6 @@
 import { DateTime } from "luxon";
 import { describe, expect, it } from "vitest";
-import { advanceOccurrence } from "./recurrence.js";
+import { advanceOccurrence, nextSeriesDue } from "./recurrence.js";
 import type { RecurrenceRule } from "./types.js";
 
 const zone = "America/New_York";
@@ -83,6 +83,17 @@ describe("advanceOccurrence", () => {
     const due = iso(2026, 5, 1, 9);
     const until = iso(2026, 5, 2, 8);
     expect(advance(due, { frequency: "daily", interval: 1, until })).toBeNull();
+  });
+
+  it("skips a cancelled slot without consuming the occurrence count", () => {
+    const due = iso(2026, 5, 1, 9);
+    const rule: RecurrenceRule = { frequency: "daily", interval: 1, count: 2 };
+    const skipped = advance(due, rule, 1);
+    const next = nextSeriesDue(
+      { dueAt: due, timeZone: zone, rule, actedOccurrences: 1, anchorAt: due },
+      [new Date(skipped ?? "").getTime()],
+    );
+    expect(DateTime.fromISO(next ?? "", { zone: "utc" }).setZone(zone).toISODate()).toBe("2026-05-03");
   });
 
   it("rejects an unknown time zone", () => {

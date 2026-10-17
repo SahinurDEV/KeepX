@@ -64,6 +64,27 @@ export function splitDue(dueAt: string, timeZone: string, dueHasTime: boolean): 
   };
 }
 
+export function postponeDue(input: {
+  dueAt: string | null;
+  dueHasTime: boolean;
+  timeZone: string;
+  nowIso: string;
+}): { dueAt: string; dueHasTime: boolean } {
+  const now = instantInZone(input.nowIso, input.timeZone);
+  const base = input.dueAt ? DateTime.fromISO(input.dueAt, { zone: "utc" }).setZone(input.timeZone) : now;
+  if (!base.isValid) throw new Error("Could not postpone that date.");
+  const next = base.plus({ days: 1 });
+  if (!next.isValid) throw new Error("Could not postpone that date.");
+  if (input.dueAt && input.dueHasTime) {
+    const dueAt = next.toUTC().toISO();
+    if (!dueAt) throw new Error("Could not postpone that date.");
+    return { dueAt, dueHasTime: true };
+  }
+  const dueAt = next.startOf("day").toUTC().toISO();
+  if (!dueAt) throw new Error("Could not postpone that date.");
+  return { dueAt, dueHasTime: false };
+}
+
 export function assertTimeZone(timeZone: string): void {
   if (!DateTime.now().setZone(timeZone).isValid) {
     throw new Error("The time zone is not recognized.");

@@ -1,6 +1,6 @@
 # Synchronization design
 
-This document is the target design. The current web client does **not** sync offline edits. It refuses mutations while `navigator.onLine` is false and shows that state.
+The web client queues task creates, edits, completes, reopens, deletes, restores, and postpones in IndexedDB. A header shows synced, pending, retrying, or needs attention. List, tag, reorder, and archive changes still need a connection. The sections below are the target for the rest of that design.
 
 ## Goal
 
@@ -8,7 +8,7 @@ A device can create and edit tasks without a connection, then converge with the 
 
 ## Client store
 
-- Web: IndexedDB database `vela`, stores `tasks`, `lists`, `tags`, and `mutations`
+- Web: IndexedDB database `keepx`, store `mutations`
 - Desktop and mobile, later: the same mutation shape in SQLite or the platform database
 
 ## Mutation record
@@ -42,8 +42,8 @@ Creates already use `Idempotency-Key` on `POST /tasks`. The queue id should be t
 
 ## Status in the interface
 
-Show one of: synced, pending local changes, retrying, or needs attention. Do not show “synced” when the queue is non-empty.
+Show one of: synced, pending local changes, retrying, or needs attention. Do not show “synced” when the queue is non-empty. Clicking the status retries the queue when the browser is online. Needs-attention notices name conflicting fields, or say a change failed after several tries.
 
 ## Current gap
 
-None of the IndexedDB queue is implemented. Reloading the page reloads server state only. Two devices see updates only after each one refetches.
+Task create, update, complete, reopen, delete, and restore are queued. A same-field revision conflict asks the person to keep their edit or the server edit. List, tag, reorder, and archive changes still need a connection. The local task and list caches from the original design are not stored yet.

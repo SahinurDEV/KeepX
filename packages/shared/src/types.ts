@@ -39,7 +39,18 @@ export interface UserDto {
   email: string;
   name: string;
   timeZone: string;
+  emailReminders: boolean;
+  pushReminders: boolean;
+  plan: "personal" | "plus";
   createdAt: string;
+}
+
+export interface SessionDto {
+  id: string;
+  createdAt: string;
+  expiresAt: string;
+  userAgent: string;
+  current: boolean;
 }
 
 export interface ListDto {
@@ -50,6 +61,13 @@ export interface ListDto {
   sortOrder: number;
   isInbox: boolean;
   archivedAt: string | null;
+  role: "owner" | "editor";
+}
+
+export interface ListMemberDto {
+  id: string;
+  email: string;
+  role: "owner" | "editor";
 }
 
 export interface TagDto {
@@ -74,8 +92,19 @@ export interface TaskDto {
   reminderOffsetMinutes: number | null;
   recurrence: RecurrenceRule | null;
   anchorAt: string | null;
+  /** Series slot when this open occurrence differs from the repeat rule. */
+  occurrenceOriginalDueAt: string | null;
   parentId: string | null;
+  /** Title of the parent task when this task is a subtask. */
+  parentTitle?: string | null;
   sortOrder: number;
+  pinned: boolean;
+  assigneeId: string | null;
+  assigneeName: string | null;
+  /** Direct subtasks that are not deleted. Present on task lists. */
+  subtaskCount?: number;
+  /** Direct subtasks that are still open. Present on task lists. */
+  openSubtaskCount?: number;
   completedAt: string | null;
   deletedAt: string | null;
   createdAt: string;
@@ -92,6 +121,39 @@ export interface OccurrenceDto {
   actedAt: string;
 }
 
+export interface AccountImportResult {
+  lists: number;
+  tags: number;
+  tasks: number;
+  occurrences: number;
+  listIds: string[];
+  tagIds: string[];
+  taskIds: string[];
+}
+
+export interface AccountExportDto {
+  exportedAt: string;
+  truncated: boolean;
+  account: {
+    email: string;
+    name: string;
+    timeZone: string;
+    emailReminders: boolean;
+    pushReminders: boolean;
+    plan: "personal" | "plus";
+  };
+  lists: Array<ListDto & { members: ListMemberDto[] }>;
+  tags: TagDto[];
+  tasks: TaskDto[];
+  occurrences: OccurrenceDto[];
+}
+
+export interface PushDeviceDto {
+  id: string;
+  platform: "web" | "android" | "ios";
+  createdAt: string;
+}
+
 export interface ReminderDto {
   id: string;
   taskId: string;
@@ -104,9 +166,21 @@ export interface ReminderDto {
 export interface MetaDto {
   appName: string;
   version: string;
-  emailRecovery: false;
-  notificationChannels: ["in_app"];
-  billing: false;
+  emailRecovery: boolean;
+  notificationChannels: ("in_app" | "email" | "web_push" | "expo_push")[];
+  webPushPublicKey: string | null;
+  billing: boolean;
+}
+
+export interface EntitlementDto {
+  plan: "personal" | "plus";
+  billing: boolean;
+  features: {
+    tasks: true;
+    sharing: true;
+    emailReminders: true;
+    pushReminders: true;
+  };
 }
 
 export interface ErrorBody {
@@ -115,6 +189,7 @@ export interface ErrorBody {
     message: string;
     details?: { path: string; message: string }[];
     requestId?: string;
+    task?: TaskDto;
   };
 }
 

@@ -1,0 +1,21 @@
+{
+  "name": "@vela/desktop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "KeepX desktop shell. It opens the local web app.",
+  "main": "dist/main.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.build.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit",
+    "test": "vitest run",
+    "start": "electron .",
+    "package": "electron-builder --win portable"
+  },
+  "devDependencies": {
+    "@types/node": "^22.15.32",
+    "electron": "^35.7.5",
+    "electron-builder": "^25.1.8",
+    "typescript": "^5.8.3",
+    "vitest": "^3.2.3"
+  }
+}

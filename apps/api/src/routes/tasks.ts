@@ -1,10 +1,15 @@
 import { Router } from "express";
 import { z } from "zod";
 import {
+  assignTaskSchema,
   batchSchema,
   createTaskSchema,
   idempotencyKeySchema,
   reorderSchema,
+  pinTaskSchema,
+  purgeSelectedSchema,
+  restoreSelectedSchema,
+  sortTasksSchema,
   taskQuerySchema,
   updateTaskSchema,
 } from "@vela/validation";
@@ -14,15 +19,29 @@ import { requireUser, userId } from "../middleware/auth.js";
 import {
   archiveTask,
   batchTasks,
+  clearCompleted,
   completeTask,
+  finishSubtasks,
   createTask,
   createTaskIdempotent,
+  duplicateTask,
+  emptyTrash,
   getTask,
   listTasks,
+  omitOccurrence,
+  restoreOmittedOccurrence,
+  postponeTask,
+  pinTask,
+  assignTask,
+  purgeSelected,
+  purgeTask,
   reorderTasks,
+  restorePurged,
+  restoreSelected,
   restoreTask,
   skipTask,
   softDeleteTask,
+  sortListTasks,
   unarchiveTask,
   uncompleteTask,
   updateTask,
@@ -51,10 +70,76 @@ export function taskRouter(config: Config): Router {
   );
 
   router.post(
+    "/tasks/sort",
+    asyncRoute(async (req, res) => {
+      const body = parseBody<z.infer<typeof sortTasksSchema>>(sortTasksSchema, req.body);
+      await sortListTasks(userId(req), body.listId, body.by);
+      res.status(204).end();
+    }),
+  );
+
+  router.post(
     "/tasks/batch",
     asyncRoute(async (req, res) => {
       const body = parseBody<z.infer<typeof batchSchema>>(batchSchema, req.body);
-      res.json({ tasks: await batchTasks(userId(req), body.ids, body.action) });
+      res.json({
+        tasks: await batchTasks(
+          userId(req),
+          body.ids,
+          body.action,
+          body.listId,
+          body.priority,
+          body.dueAt,
+          body.dueHasTime,
+          body.tagId,
+          body.tagMode,
+          body.reminderOffsetMinutes,
+          body.startAt,
+          body.estimatedMinutes,
+          body.pinned,
+          body.assigneeId,
+          body.recurrence,
+          body.parentId,
+        ),
+      });
+    }),
+  );
+
+  router.post(
+    "/tasks/empty-trash",
+    asyncRoute(async (req, res) => {
+      res.json(await emptyTrash(userId(req)));
+    }),
+  );
+
+  router.post(
+    "/tasks/purge",
+    asyncRoute(async (req, res) => {
+      const body = parseBody<z.infer<typeof purgeSelectedSchema>>(purgeSelectedSchema, req.body);
+      res.json(await purgeSelected(userId(req), body.ids));
+    }),
+  );
+
+  router.post(
+    "/tasks/purge/restore",
+    asyncRoute(async (req, res) => {
+      const body = parseBody<z.infer<typeof restoreSelectedSchema>>(restoreSelectedSchema, req.body);
+      res.json(await restorePurged(userId(req), body.ids));
+    }),
+  );
+
+  router.post(
+    "/tasks/restore",
+    asyncRoute(async (req, res) => {
+      const body = parseBody<z.infer<typeof restoreSelectedSchema>>(restoreSelectedSchema, req.body);
+      res.json(await restoreSelected(userId(req), body.ids));
+    }),
+  );
+
+  router.post(
+    "/tasks/clear-completed",
+    asyncRoute(async (req, res) => {
+      res.json(await clearCompleted(userId(req)));
     }),
   );
 
@@ -105,10 +190,45 @@ export function taskRouter(config: Config): Router {
     );
   };
 
+  router.post(
+    "/tasks/:id/duplicate",
+    asyncRoute(async (req, res) => {
+      res.status(201).json(await duplicateTask(userId(req), req.params.id ?? ""));
+    }),
+  );
+
+  router.post(
+    "/tasks/:id/purge",
+    asyncRoute(async (req, res) => {
+      res.json(await purgeTask(userId(req), req.params.id ?? ""));
+    }),
+  );
+
   action("restore", restoreTask);
   action("complete", completeTask);
+  action("finish-subtasks", finishSubtasks);
   action("uncomplete", uncompleteTask);
   action("skip", skipTask);
+  action("omit", omitOccurrence);
+  action("restore-omitted", restoreOmittedOccurrence);
+  action("postpone", postponeTask);
+
+  router.post(
+    "/tasks/:id/pin",
+    asyncRoute(async (req, res) => {
+      const body = parseBody<z.infer<typeof pinTaskSchema>>(pinTaskSchema, req.body);
+      res.json(await pinTask(userId(req), req.params.id ?? "", body.pinned));
+    }),
+  );
+
+  router.post(
+    "/tasks/:id/assign",
+    asyncRoute(async (req, res) => {
+      const body = parseBody<z.infer<typeof assignTaskSchema>>(assignTaskSchema, req.body);
+      res.json(await assignTask(userId(req), req.params.id ?? "", body.userId));
+    }),
+  );
+
   action("archive", archiveTask);
   action("unarchive", unarchiveTask);
 

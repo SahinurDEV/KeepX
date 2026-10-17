@@ -55,7 +55,9 @@ export function SiteFrame({ children }: { children: ReactNode }) {
           ))}
         </nav>
       </header>
-      <main id="content">{children}</main>
+      <main id="content" tabIndex={-1}>
+        {children}
+      </main>
       <footer className="mx-auto mt-20 grid max-w-6xl gap-6 border-t border-line px-5 py-10 text-sm text-muted md:grid-cols-[1.4fr_1fr_1fr]">
         <div>
           <p className="font-medium text-ink">{name}</p>

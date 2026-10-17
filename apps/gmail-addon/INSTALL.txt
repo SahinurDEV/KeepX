@@ -1,0 +1,10 @@
+This is a Google Apps Script project, not a Marketplace listing.
+
+Google runs the script, so it cannot call KeepX at http://127.0.0.1:3000.
+KEEPX_BASE must be a public https address for your KeepX API.
+
+1. Open https://script.google.com and create a project.
+2. Replace the default files with appsscript.json and Code.js.
+3. In Project settings, Script properties, add KEEPX_BASE and KEEPX_TOKEN.
+   Create the token in KeepX Settings while signed in.
+4. Deploy as a Gmail add-on test deployment for your own account.

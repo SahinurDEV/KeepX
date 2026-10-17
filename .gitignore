@@ -13,3 +13,9 @@ Thumbs.db
 *.tsbuildinfo
 playwright-report
 test-results
+apps/desktop/release
+apps/desktop/release-linux
+apps/mobile/.expo
+apps/mobile/android
+apps/mobile/ios
+apps/web/public/downloads/*.AppImage

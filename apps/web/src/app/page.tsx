@@ -7,7 +7,7 @@ const features = [
   ["Lists and inbox", "Capture anything, then sort it into lists when you know where it belongs."],
   ["Calendar", "Month, week, and day in your time zone. Move a task by choosing another day."],
   ["Repeating tasks", "Daily, weekly, monthly, and yearly rules, with a history of what you finished."],
-  ["Reminders", "Save a reminder on the task. It shows in the app while the tab is open."],
+  ["Reminders", "Save a reminder on the task. It shows in the app while the tab is open, and the Windows or Linux desktop app can raise a system notification when the OS supports it. Email is sent when you turn it on and mail is configured. This browser can show a notification when push is configured and you allow it."],
   ["Search and filters", "Find a task by title, or narrow a list by priority."],
   ["One account", "Your lists stay on the server and reload with you. Other people cannot see them."],
 ];

@@ -1,25 +1,35 @@
 import { Router } from "express";
 import rateLimit from "express-rate-limit";
 import { z } from "zod";
-import { loginSchema, passwordChangeSchema, profileSchema, registerSchema } from "@vela/validation";
+import { accessTokenSchema, deleteAccountSchema, loginSchema, passwordChangeSchema, passwordResetRequestSchema, passwordResetSchema, profileSchema, registerSchema } from "@vela/validation";
 import type { Config } from "../config.js";
-import { HttpError, asyncRoute, parseBody } from "../http.js";
+import { asyncRoute, parseBody } from "../http.js";
+import type { Mailer } from "../mailer.js";
 import { requireUser, userId } from "../middleware/auth.js";
+import { deleteAccount } from "../services/account.js";
 import {
   changePassword,
   clearSessionCookie,
+  restorePassword,
+  createAccessToken,
   currentUser,
   hashToken,
   loginUser,
   logoutUser,
+  listAccessTokens,
+  listSessions,
   registerUser,
+  requestPasswordReset,
+  resetPassword,
+  restoreAccessToken,
+  restoreSession,
+  revokeAccessToken,
+  revokeSession,
   setSessionCookie,
   updateProfile,
 } from "../services/auth.js";
 
-const recoverySchema = z.object({ email: z.string().trim().email() });
-
-export function authRouter(config: Config): Router {
+export function authRouter(config: Config, mailer: Mailer | null): Router {
   const router = Router();
   const limit = rateLimit({
     windowMs: 15 * 60 * 1000,
@@ -64,9 +74,81 @@ export function authRouter(config: Config): Router {
   router.post(
     "/auth/recovery",
     limit,
-    asyncRoute(async (req, _res) => {
-      parseBody<z.infer<typeof recoverySchema>>(recoverySchema, req.body);
-      throw new HttpError(503, "EMAIL_NOT_CONFIGURED", "Password recovery email is not configured.");
+    asyncRoute(async (req, res) => {
+      const body = parseBody<z.infer<typeof passwordResetRequestSchema>>(passwordResetRequestSchema, req.body);
+      await requestPasswordReset(body.email, config, mailer);
+      res.status(204).end();
+    }),
+  );
+
+  router.post(
+    "/auth/reset",
+    limit,
+    asyncRoute(async (req, res) => {
+      const body = parseBody<z.infer<typeof passwordResetSchema>>(passwordResetSchema, req.body);
+      await resetPassword(body.token, body.password, config);
+      clearSessionCookie(res, config);
+      res.status(204).end();
+    }),
+  );
+
+  router.get(
+    "/auth/sessions",
+    requireUser(config),
+    asyncRoute(async (req, res) => {
+      res.json(await listSessions(userId(req), req.tokenHash));
+    }),
+  );
+
+  router.delete(
+    "/auth/sessions/:id",
+    requireUser(config),
+    asyncRoute(async (req, res) => {
+      const result = await revokeSession(userId(req), req.params.id ?? "", req.tokenHash);
+      if (result.current) clearSessionCookie(res, config);
+      res.status(204).end();
+    }),
+  );
+
+  router.post(
+    "/auth/sessions/:id/restore",
+    requireUser(config),
+    asyncRoute(async (req, res) => {
+      res.json(await restoreSession(userId(req), req.params.id ?? ""));
+    }),
+  );
+
+  router.post(
+    "/auth/tokens",
+    requireUser(config),
+    asyncRoute(async (req, res) => {
+      const body = parseBody<z.infer<typeof accessTokenSchema>>(accessTokenSchema, req.body);
+      res.status(201).json(await createAccessToken(userId(req), body.name, config));
+    }),
+  );
+
+  router.get(
+    "/auth/tokens",
+    requireUser(config),
+    asyncRoute(async (req, res) => {
+      res.json(await listAccessTokens(userId(req)));
+    }),
+  );
+
+  router.delete(
+    "/auth/tokens/:id",
+    requireUser(config),
+    asyncRoute(async (req, res) => {
+      await revokeAccessToken(userId(req), req.params.id ?? "");
+      res.status(204).end();
+    }),
+  );
+
+  router.post(
+    "/auth/tokens/:id/restore",
+    requireUser(config),
+    asyncRoute(async (req, res) => {
+      res.json(await restoreAccessToken(userId(req), req.params.id ?? ""));
     }),
   );
 
@@ -76,6 +158,15 @@ export function authRouter(config: Config): Router {
     asyncRoute(async (req, res) => {
       const body = parseBody<z.infer<typeof passwordChangeSchema>>(passwordChangeSchema, req.body);
       await changePassword(userId(req), req.tokenHash ?? "", body, config);
+      res.status(204).end();
+    }),
+  );
+
+  router.post(
+    "/auth/password/restore",
+    requireUser(config),
+    asyncRoute(async (req, res) => {
+      await restorePassword(userId(req));
       res.status(204).end();
     }),
   );
@@ -94,6 +185,17 @@ export function authRouter(config: Config): Router {
     asyncRoute(async (req, res) => {
       const body = parseBody<z.infer<typeof profileSchema>>(profileSchema, req.body);
       res.json(await updateProfile(userId(req), body));
+    }),
+  );
+
+  router.delete(
+    "/me",
+    requireUser(config),
+    asyncRoute(async (req, res) => {
+      const body = parseBody<z.infer<typeof deleteAccountSchema>>(deleteAccountSchema, req.body);
+      await deleteAccount(userId(req), body.password);
+      clearSessionCookie(res, config);
+      res.status(204).end();
     }),
   );
 

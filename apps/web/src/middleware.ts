@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from "next/server";
 
-const prefixes = ["/inbox", "/today", "/upcoming", "/tasks", "/completed", "/calendar", "/search", "/lists", "/tags", "/settings"];
+const prefixes = ["/inbox", "/today", "/upcoming", "/tasks", "/completed", "/trash", "/calendar", "/search", "/lists", "/tags", "/settings"];
 
 export function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
@@ -24,6 +24,8 @@ export const config = {
     "/tasks/:path*",
     "/completed",
     "/completed/:path*",
+    "/trash",
+    "/trash/:path*",
     "/calendar",
     "/calendar/:path*",
     "/search",

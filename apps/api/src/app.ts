@@ -1,21 +1,32 @@
 import cookieParser from "cookie-parser";
 import cors from "cors";
-import express, { type Express } from "express";
+import express, { type Express, type Request as ExpressRequest } from "express";
 import helmet from "helmet";
 import mongoose from "mongoose";
 import { randomUUID } from "node:crypto";
+import { createBilling, type Billing } from "./billing.js";
 import { getConfig } from "./config.js";
 import { HttpError, errorHandler } from "./http.js";
+import { createSmtpMailer, type Mailer } from "./mailer.js";
+import { isAllowedOrigin } from "./origin.js";
 import { primeDummyHash } from "./services/auth.js";
 import { authRouter } from "./routes/auth.js";
+import { createPushSender, type PushSender } from "./push.js";
+import { billingRouter } from "./routes/billing.js";
+import { deviceRouter } from "./routes/devices.js";
+import { exportRouter } from "./routes/export.js";
 import { healthRouter } from "./routes/health.js";
+import { importRouter } from "./routes/import.js";
 import { listRouter } from "./routes/lists.js";
 import { reminderRouter } from "./routes/reminders.js";
 import { tagRouter } from "./routes/tags.js";
 import { taskRouter } from "./routes/tasks.js";
 
-export async function createApp(): Promise<Express> {
+export async function createApp(options?: { mailer?: Mailer | null; push?: PushSender | null; billing?: Billing | null }): Promise<Express> {
   const config = getConfig();
+  const mailer = options && "mailer" in options ? (options.mailer ?? null) : createSmtpMailer(config);
+  const push = options && "push" in options ? (options.push ?? null) : createPushSender(config);
+  const billing = options && "billing" in options ? (options.billing ?? null) : createBilling(config);
   mongoose.set("strictQuery", true);
   if (mongoose.connection.readyState === 0) {
     await mongoose.connect(config.mongoUri);
@@ -25,9 +36,26 @@ export async function createApp(): Promise<Express> {
   const app = express();
   if (config.trustProxy) app.set("trust proxy", 1);
   app.disable("x-powered-by");
-  app.use(helmet());
-  app.use(cors({ origin: config.appOrigin, credentials: true }));
-  app.use(express.json({ limit: "1mb" }));
+  app.use(helmet({ crossOriginResourcePolicy: { policy: "cross-origin" } }));
+  app.use(
+    cors({
+      origin(origin, callback) {
+        if (!origin || isAllowedOrigin(origin, config.appOrigin)) callback(null, origin ?? true);
+        else callback(null, false);
+      },
+      credentials: true,
+    }),
+  );
+  app.use(
+    express.json({
+      limit: "1mb",
+      verify(req, _res, buf) {
+        if (req.url?.startsWith("/api/v1/billing/webhook")) {
+          (req as ExpressRequest & { rawBody?: Buffer }).rawBody = Buffer.from(buf);
+        }
+      },
+    }),
+  );
   app.use(cookieParser());
   app.use((req, res, next) => {
     req.requestId = req.get("x-request-id") || randomUUID();
@@ -47,7 +75,7 @@ export async function createApp(): Promise<Express> {
       );
     });
     const origin = req.get("origin");
-    if (origin && origin !== config.appOrigin) {
+    if (!isAllowedOrigin(origin, config.appOrigin)) {
       next(new HttpError(403, "ORIGIN_REJECTED", "This origin is not allowed."));
       return;
     }
@@ -55,8 +83,20 @@ export async function createApp(): Promise<Express> {
   });
 
   const api = express.Router();
-  api.use(healthRouter(config));
-  api.use(authRouter(config));
+  api.use(
+    healthRouter(config, {
+      email: mailer !== null,
+      webPush: push?.canSend("web") ?? false,
+      expoPush: push?.canSend("expo") ?? false,
+      webPushPublicKey: push?.webPushPublicKey ?? null,
+      billing: billing !== null,
+    }),
+  );
+  api.use(authRouter(config, mailer));
+  api.use(billingRouter(config, billing));
+  api.use(deviceRouter(config));
+  api.use(exportRouter(config));
+  api.use(importRouter(config));
   api.use(listRouter(config));
   api.use(tagRouter(config));
   api.use(taskRouter(config));

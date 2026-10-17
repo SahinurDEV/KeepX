@@ -1,0 +1,21 @@
+appId: com.keepx.desktop
+productName: KeepX
+copyright: Copyright (c) 2026 Sahinur
+asar: true
+npmRebuild: false
+directories:
+  output: release
+files:
+  - dist/**
+  - static/**
+  - package.json
+  - "!**/*.map"
+  - "!**/*.test.js"
+win:
+  target: portable
+  artifactName: KeepX-${version}-win-x64.${ext}
+  signAndEditExecutable: false
+linux:
+  target: AppImage
+  artifactName: KeepX-${version}-linux-x64.${ext}
+  category: Office

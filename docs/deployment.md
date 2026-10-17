@@ -23,7 +23,11 @@ Required in production:
 
 Leave `TRUST_PROXY=true` only when a reverse proxy overwrites forwarded headers.
 
-SMTP variables are reserved. Until the mailer exists, unset SMTP keeps recovery disabled.
+Password recovery stays disabled until both `SMTP_HOST` and `SMTP_FROM` are set. Optional: `SMTP_PORT` (default 587), `SMTP_SECURE=true` for implicit TLS, `SMTP_USER`, and `SMTP_PASS`. Leave them unset for local development.
+
+Browser push stays disabled until `VAPID_PUBLIC_KEY`, `VAPID_PRIVATE_KEY`, and `VAPID_SUBJECT` are all set. The subject is a `mailto:` or `https:` URL. Phone push stays disabled until `EXPO_ACCESS_TOKEN` is set. The Android package in this repo does not register an Expo token.
+
+Billing stays disabled until `STRIPE_SECRET_KEY`, `STRIPE_WEBHOOK_SECRET`, and `STRIPE_PRICE_ID` are all set. Checkout does not change the plan. Only a signed webhook does.
 
 ## Database
 

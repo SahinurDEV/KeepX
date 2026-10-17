@@ -1,7 +1,7 @@
 import { DateTime } from "luxon";
 import { describe, expect, it } from "vitest";
 import { assertCatalogIntegrity, PLATFORM_CATALOG } from "./catalog.js";
-import { formatDueLabel, isOverdue, todayBounds } from "./dates.js";
+import { formatDueLabel, isOverdue, postponeDue, todayBounds } from "./dates.js";
 
 describe("dates", () => {
   it("bounds today in the given time zone", () => {
@@ -24,6 +24,26 @@ describe("dates", () => {
     expect(formatDueLabel("2026-10-13T15:00:00.000Z", zone, now, false)).toBe("Yesterday");
     expect(formatDueLabel("2026-10-14T18:00:00.000Z", zone, now, false)).toBe("Today");
     expect(formatDueLabel("2026-10-15T15:00:00.000Z", zone, now, true)).toBe("Tomorrow, 3:00 PM");
+  });
+
+  it("moves a due time one calendar day later and keeps the clock time across a daylight-saving change", () => {
+    const shifted = postponeDue({
+      dueAt: "2026-03-07T20:30:00.000Z",
+      dueHasTime: true,
+      timeZone: "America/New_York",
+      nowIso: "2026-03-07T16:00:00.000Z",
+    });
+    expect(shifted.dueHasTime).toBe(true);
+    expect(DateTime.fromISO(shifted.dueAt, { zone: "utc" }).setZone("America/New_York").toFormat("yyyy-LL-dd HH:mm")).toBe(
+      "2026-03-08 15:30",
+    );
+    const undated = postponeDue({
+      dueAt: null,
+      dueHasTime: false,
+      timeZone: "UTC",
+      nowIso: "2026-10-15T18:00:00.000Z",
+    });
+    expect(undated).toEqual({ dueAt: "2026-10-16T00:00:00.000Z", dueHasTime: false });
   });
 });
 

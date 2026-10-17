@@ -7,6 +7,7 @@ export class HttpError extends Error {
     public code: string,
     message: string,
     public details?: { path: string; message: string }[],
+    public task?: unknown,
   ) {
     super(message);
     this.name = "HttpError";
@@ -38,7 +39,13 @@ export const errorHandler: ErrorRequestHandler = (error, req, res, _next) => {
   const requestId = req.requestId;
   if (error instanceof HttpError) {
     res.status(error.status).json({
-      error: { code: error.code, message: error.message, details: error.details, requestId },
+      error: {
+        code: error.code,
+        message: error.message,
+        details: error.details,
+        requestId,
+        ...(error.task ? { task: error.task } : {}),
+      },
     });
     return;
   }

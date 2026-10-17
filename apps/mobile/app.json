@@ -1,0 +1,13 @@
+{
+  "expo": {
+    "name": "KeepX",
+    "slug": "keepx",
+    "version": "0.1.0",
+    "orientation": "portrait",
+    "userInterfaceStyle": "light",
+    "android": {
+      "package": "com.keepx.app",
+      "usesCleartextTraffic": true
+    }
+  }
+}

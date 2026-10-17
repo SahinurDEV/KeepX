@@ -1,0 +1,11 @@
+{
+  "name": "@vela/extension",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node pack.mjs",
+    "typecheck": "node --check pack.mjs && node --check src/popup.js && node --check src/task.js",
+    "test": "node --test test/task.test.mjs"
+  }
+}

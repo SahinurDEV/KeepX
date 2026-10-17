@@ -43,6 +43,19 @@ export function advanceOccurrence(input: AdvanceInput): string | null {
   return next.toUTC().toISO();
 }
 
+/** Next due instant after `dueAt`, skipping cancelled series slots. Cancelled slots do not consume `count`. */
+export function nextSeriesDue(input: AdvanceInput, cancelledAt: number[]): string | null {
+  const blocked = new Set(cancelledAt);
+  let cursor = input.dueAt;
+  for (let step = 0; step < MAX_DAILY_STEPS; step += 1) {
+    const next = advanceOccurrence({ ...input, dueAt: cursor });
+    if (!next) return null;
+    if (!blocked.has(new Date(next).getTime())) return next;
+    cursor = next;
+  }
+  return null;
+}
+
 function computeNext(current: DateTime, anchor: DateTime, rule: RecurrenceRule): DateTime | null {
   const interval = rule.interval;
   if (rule.frequency === "daily") return current.plus({ days: interval });

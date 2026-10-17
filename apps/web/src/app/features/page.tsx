@@ -8,8 +8,8 @@ const features = [
   ["Lists and tags", "Group work your way. Each list has a color and an icon."],
   ["Priorities", "None, low, medium, and high, with filters on every list."],
   ["Subtasks", "Break a task down without leaving its detail panel."],
-  ["Calendar", "Month, week, and day. Select a task, then choose a day to reschedule it."],
-  ["Reminders", "Saved on the server and shown in the open app. Phone and desktop alerts are not available yet."],
+  ["Calendar", "Month, week, and day. Select a task, then choose a day to reschedule it. A repeating task moves only that date."],
+  ["Reminders", "Saved on the server and shown in the open app. The Windows or Linux desktop app can also raise a system notification when the OS supports it. Email is sent when you turn it on and mail is configured. Browser push is sent when you allow it and the server has push keys. The Android package does not register for phone push."],
   ["Search", "Find tasks by title or description."],
   ["Themes", "Light, dark, or match the system."],
 ];

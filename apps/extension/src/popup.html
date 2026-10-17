@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>KeepX</title>
+    <link rel="stylesheet" href="popup.css" />
+  </head>
+  <body>
+    <main>
+      <header>
+        <div class="brand" aria-hidden="true"></div>
+        <div>
+          <h1>KeepX</h1>
+          <p class="tag">Add to Inbox on this computer</p>
+        </div>
+      </header>
+      <label>
+        Token from Settings → App tokens
+        <input id="token" type="password" autocomplete="off" placeholder="Paste token" />
+      </label>
+      <label>
+        Task
+        <input id="title" type="text" maxlength="500" placeholder="What needs doing?" />
+      </label>
+      <div class="row">
+        <button id="add" type="button">Add task</button>
+        <button id="save-tab" type="button">Save this tab</button>
+      </div>
+      <p id="status" role="status"></p>
+      <p class="links">
+        <a id="open-keepx" href="http://127.0.0.1:3000/inbox" target="_blank" rel="noreferrer">Open KeepX</a>
+        <a id="open-settings" href="http://127.0.0.1:3000/settings" target="_blank" rel="noreferrer">Settings</a>
+      </p>
+    </main>
+    <script type="module" src="popup.js"></script>
+  </body>
+</html>

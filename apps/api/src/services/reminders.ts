@@ -1,4 +1,5 @@
 import type { Types } from "mongoose";
+import { HttpError } from "../http.js";
 import { Reminder, Task, type TaskRecord } from "../models.js";
 import { toReminderDto } from "../serialize.js";
 
@@ -14,6 +15,8 @@ export async function syncReminder(task: TaskRecord): Promise<void> {
     fireAt,
     channel: "in_app",
     status: "scheduled",
+    emailStatus: "pending",
+    pushStatus: "pending",
   });
 }
 
@@ -40,8 +43,38 @@ export async function acknowledgeReminder(userId: string, reminderId: string): P
   );
   if (updated) return;
   const existing = await Reminder.findOne({ _id: reminderId, userId });
-  if (!existing) {
-    const { HttpError } = await import("../http.js");
-    throw new HttpError(404, "NOT_FOUND", "Reminder not found.");
+  if (!existing) throw new HttpError(404, "NOT_FOUND", "Reminder not found.");
+}
+
+export async function unacknowledgeReminder(userId: string, reminderId: string): Promise<void> {
+  if (!/^[a-f\d]{24}$/i.test(reminderId)) throw new HttpError(404, "NOT_FOUND", "Reminder not found.");
+  const updated = await Reminder.findOneAndUpdate(
+    { _id: reminderId, userId, status: "delivered" },
+    { $set: { status: "scheduled", deliveredAt: null } },
+  );
+  if (updated) return;
+  const existing = await Reminder.findOne({ _id: reminderId, userId });
+  if (!existing) throw new HttpError(404, "NOT_FOUND", "Reminder not found.");
+  throw new HttpError(400, "REMINDER_OPEN", "That reminder is still open.");
+}
+
+export async function snoozeReminder(
+  userId: string,
+  reminderId: string,
+  input: { minutes?: number; fireAt?: string },
+) {
+  const fireAt = input.fireAt ? new Date(input.fireAt) : new Date(Date.now() + (input.minutes ?? 15) * 60_000);
+  if (Number.isNaN(fireAt.getTime())) throw new HttpError(400, "INVALID_FIRE_AT", "Choose a valid fire time.");
+  const updated = await Reminder.findOneAndUpdate(
+    { _id: reminderId, userId, status: "scheduled" },
+    { $set: { fireAt } },
+    { new: true },
+  );
+  if (!updated) {
+    const existing = await Reminder.findOne({ _id: reminderId, userId });
+    if (!existing) throw new HttpError(404, "NOT_FOUND", "Reminder not found.");
+    throw new HttpError(400, "REMINDER_CLOSED", "That reminder was already dismissed.");
   }
+  const task = await Task.findOne({ _id: updated.taskId, userId, deletedAt: null });
+  return toReminderDto(updated, task?.title ?? "Task");
 }
